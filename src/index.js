@@ -2,11 +2,14 @@ import React, {Component} from 'react';
 import ReactDOM from "react-dom";
 import "./assets/style.css";
 import QuestionBox from './components/QuestionBox';
+import Result from './components/Result';
 import quizService from './quizService';
 
 class QuizBee extends Component {
   state= {
-    questionBank:[]
+    questionBank:[],
+    score:0,
+    responses:0
   };
 
   
@@ -18,6 +21,29 @@ class QuizBee extends Component {
     });
   };
 
+  conputerAnswer=(answer, correctAnswer)=> {
+    console.log("aaaaa", answer)
+    console.log("ccccc", correctAnswer)
+    
+    if(answer===correctAnswer) {
+      this.setState({
+        score:this.state.score+1
+      });
+    }
+    this.setState({
+      responses:this.state.responses<5 ? this.state.responses+1:5
+    })
+
+  }
+
+  playAgain=()=> {
+    console.log("Events")
+    this.getQuestions();
+    this.setState({
+      score:0,
+      responses:0
+    })
+  }
   componentDidMount() {
     this.getQuestions();
   }
@@ -38,12 +64,19 @@ class QuizBee extends Component {
         <div className="title">QuizBee</div>
         {/* <QuestionBox/> */}
         <div>
-        {this.state.questionBank.length > 0 && this.state.questionBank.map(({question, answers, correct, questionId})=> (
-           <QuestionBox question={question} options={answers} key={questionId}/>
+        {this.state.questionBank.length > 0 &&  this.state.responses < 5 && this.state.questionBank.map(({question, answers, correct, questionId})=> (
+           <QuestionBox 
+           question={question} 
+           options={answers} 
+           key={questionId} 
+           selected={answer1=> this.conputerAnswer(answer1, correct)}/>
           // <h4>{question}</h4>
         ))}
+
+      {this.state.responses === 5 ? (<Result score={this.state.score} playAgain={this.playAgain}/>) : null}
         </div>
 
+          
       </div>
     );
   }
